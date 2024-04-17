@@ -1,18 +1,28 @@
+use crossterm::{cursor, ExecutableCommand};
 use std::io::{stdout, Write};
 use std::process::Command;
 use std::thread;
 use std::time::{Duration, Instant};
 
 fn main() {
-    let work = Instant::now();
-    let five_secs = Duration::from_secs(62);
+    let time = Instant::now();
+    let work = Duration::from_secs(25 * 60);
 
     let mut stdout = stdout();
 
+    stdout.execute(cursor::Hide).unwrap();
+
+    println!("Basic pomodoro timer. CTRL-C to stop");
+
     loop {
-        if work.elapsed() > five_secs {
+        if time.elapsed() > work {
             Command::new("notify-send")
-                .arg("5 seconds have passed")
+                .arg("Break time!")
+                .output()
+                .expect("failed to execute process");
+
+            Command::new("spd-say")
+                .arg("Break time!")
                 .output()
                 .expect("failed to execute process");
 
@@ -23,7 +33,7 @@ fn main() {
             break; // Exit loop once the condition is met
         } else {
             // Print time left
-            let elapsed_time = work.elapsed().as_secs();
+            let elapsed_time = time.elapsed().as_secs();
             let minutes_left = 25 - elapsed_time.div_euclid(60) - 1;
             let seconds_left = 60 - elapsed_time.rem_euclid(60) - 1;
             write!(
@@ -38,35 +48,18 @@ fn main() {
         }
     }
 
+    stdout.execute(cursor::Show).unwrap();
+
     // Wait for 5 minutes
-    thread::sleep(Duration::from_secs(5));
+    thread::sleep(Duration::from_secs(5 * 60));
     Command::new("notify-send")
-        .arg("Another 5 seconds have passed")
+        .arg("Break over")
         .output()
         .expect("failed to execute process");
     println!("Break over");
-}
 
-// use std::{thread, time};
-// use std::io::{Write, stdout};
-// use crossterm::{QueueableCommand, cursor, terminal, ExecutableCommand};
-//
-// fn main() {
-//     let mut stdout = stdout();
-//
-//     stdout.execute(cursor::Hide).unwrap();
-//     for i in (1..30).rev() {
-//         stdout.queue(cursor::SavePosition).unwrap();
-//         stdout.write_all(format!("{}: FOOBAR ", i).as_bytes()).unwrap();
-//         stdout.queue(cursor::RestorePosition).unwrap();
-//         stdout.flush().unwrap();
-//         thread::sleep(time::Duration::from_millis(100));
-//
-//         stdout.queue(cursor::RestorePosition).unwrap();
-//         stdout.queue(terminal::Clear(terminal::ClearType::CurrentLine)).unwrap();
-//     }
-//     stdout.execute(cursor::Show).unwrap();
-//
-//     println!("Done!");
-// }
-//
+    Command::new("spd-say")
+        .arg("Break time!")
+        .output()
+        .expect("failed to execute process");
+}
