@@ -59,7 +59,7 @@ fn main() {
     println!("Break over");
 
     Command::new("spd-say")
-        .arg("Break time!")
+        .arg("Break over!")
         .output()
         .expect("failed to execute process");
 }
