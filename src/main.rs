@@ -1,4 +1,4 @@
-use crossterm::{cursor, ExecutableCommand};
+use crossterm::{cursor, terminal, ExecutableCommand};
 use std::io::{stdout, Write};
 use std::process::Command;
 use std::thread;
@@ -36,6 +36,10 @@ fn main() {
             let elapsed_time = time.elapsed().as_secs();
             let minutes_left = 25 - elapsed_time.div_euclid(60) - 1;
             let seconds_left = 60 - elapsed_time.rem_euclid(60) - 1;
+            stdout.execute(cursor::MoveToColumn(0)).unwrap(); // Move cursor to beginning
+            stdout
+                .execute(terminal::Clear(terminal::ClearType::CurrentLine))
+                .unwrap(); // Clear the line
             write!(
                 stdout,
                 "\rTime left: {:02}:{:02}",
